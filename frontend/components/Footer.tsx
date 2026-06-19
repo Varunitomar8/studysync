@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white text-center p-4 mt-8">
+    <footer className="text-center p-4 mt-8 border-t">
       <p>© 2026 StudySync. All rights reserved.</p>
 
       <div className="flex justify-center gap-4 mt-2">
