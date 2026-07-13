@@ -8,20 +8,20 @@ import Footer from "../../components/Footer";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 
-export default function Login() {
+export default function Register() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,12 +39,9 @@ export default function Login() {
         return;
       }
 
-      // Save JWT
-      localStorage.setItem("token", data.token);
+      alert("Registration Successful!");
 
-      alert("Login Successful!");
-
-      router.push("/dashboard");
+      router.push("/login");
     } catch (err) {
       console.error(err);
       alert("Server Error");
@@ -59,7 +56,7 @@ export default function Login() {
         <div className="w-[400px] border rounded-lg p-8 shadow-lg">
 
           <h1 className="text-3xl font-bold mb-6 text-center">
-            Login
+            Register
           </h1>
 
           <Input
@@ -79,20 +76,7 @@ export default function Login() {
           />
 
           <div className="mt-6 flex justify-center">
-            <Button onClick={handleLogin}>
-              Login
-            </Button>
-          </div>
-
-          <p className="text-center mt-6">
-            Don't have an account?
-          </p>
-
-          <div className="flex justify-center mt-3">
-            <Button
-              variant="secondary"
-              onClick={() => router.push("/register")}
-            >
+            <Button onClick={handleRegister}>
               Register
             </Button>
           </div>

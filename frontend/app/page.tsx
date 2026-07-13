@@ -7,6 +7,7 @@ import Hero from "../components/Hero";
 import Card from "../components/Card";
 import Footer from "../components/Footer";
 import Loader from "../components/ui/Loader";
+
 import toast from "react-hot-toast";
 
 type Task = {
@@ -24,7 +25,22 @@ export default function Home() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/tasks");
+        // Get JWT token from localStorage
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setError("Please login first.");
+          setLoading(false);
+          return;
+        }
+
+        // Fetch protected route
+        const response = await fetch("http://localhost:5000/api/tasks", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch tasks");

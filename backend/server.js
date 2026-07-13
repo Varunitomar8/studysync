@@ -2,10 +2,26 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const rateLimit = require("express-rate-limit");
+
 const Task = require("./models/Task");
+const authRoutes = require("./routes/auth");
+const verifyToken = require("./middleware/verifyToken");
 
 const app = express();
 
+// =======================
+// Rate Limiter
+// =======================
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    message: "Too many login attempts. Please try again after 15 minutes.",
+  },
+});
+
+// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected Successfully"))
@@ -14,15 +30,22 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
-// HOME ROUTE
+// Auth Routes (Protected by Rate Limiter)
+app.use("/api/auth", authLimiter, authRoutes);
+
+// Home Route
 app.get("/", (req, res) => {
   res.json({
     message: "StudySync Backend Running Successfully",
   });
 });
 
+/* ==========================
+   TASK ROUTES (PROTECTED)
+========================== */
+
 // GET ALL TASKS
-app.get("/api/tasks", async (req, res) => {
+app.get("/api/tasks", verifyToken, async (req, res) => {
   try {
     const tasks = await Task.find();
     res.status(200).json(tasks);
@@ -34,7 +57,7 @@ app.get("/api/tasks", async (req, res) => {
 });
 
 // SEARCH TASKS
-app.get("/api/tasks/search", async (req, res) => {
+app.get("/api/tasks/search", verifyToken, async (req, res) => {
   try {
     const query = req.query.q || "";
 
@@ -54,7 +77,7 @@ app.get("/api/tasks/search", async (req, res) => {
 });
 
 // GET SINGLE TASK
-app.get("/api/tasks/:id", async (req, res) => {
+app.get("/api/tasks/:id", verifyToken, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -73,7 +96,7 @@ app.get("/api/tasks/:id", async (req, res) => {
 });
 
 // CREATE TASK
-app.post("/api/tasks", async (req, res) => {
+app.post("/api/tasks", verifyToken, async (req, res) => {
   try {
     const { title, subject, completed } = req.body;
 
@@ -100,7 +123,7 @@ app.post("/api/tasks", async (req, res) => {
 });
 
 // UPDATE TASK
-app.put("/api/tasks/:id", async (req, res) => {
+app.put("/api/tasks/:id", verifyToken, async (req, res) => {
   try {
     const { title, subject, completed } = req.body;
 
@@ -129,7 +152,7 @@ app.put("/api/tasks/:id", async (req, res) => {
 });
 
 // DELETE TASK
-app.delete("/api/tasks/:id", async (req, res) => {
+app.delete("/api/tasks/:id", verifyToken, async (req, res) => {
   try {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
 
