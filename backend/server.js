@@ -1,12 +1,14 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
 const mongoose = require("mongoose");
 const rateLimit = require("express-rate-limit");
 
 const Task = require("./models/Task");
 const authRoutes = require("./routes/auth");
 const verifyToken = require("./middleware/verifyToken");
+const aiRoutes = require("./routes/ai");
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.use(express.json());
 
 // Auth Routes (Protected by Rate Limiter)
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
