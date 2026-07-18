@@ -18,6 +18,11 @@ router.post("/summarize", verifyToken, async (req, res) => {
       "https://openrouter.ai/api/v1/chat/completions",
       {
         model: "openai/gpt-oss-20b:free",
+
+        provider: {
+          order: ["NovitaAI"]
+        },
+
         messages: [
           {
             role: "system",
